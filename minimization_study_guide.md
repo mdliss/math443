@@ -1,188 +1,192 @@
 # Minimization in Applied Linear Algebra: Comprehensive Study Guide
 
-## 📚 Theoretical Foundations
+## Theoretical Foundations
 
-### ✅ Minimization Principles in Physical & Mathematical Systems
-
+### Minimization Principles in Physical & Mathematical Systems  
 Many physical and mathematical systems operate on principles of minimization. In physics, stable equilibrium corresponds to minimizing potential energy. In mathematics, solving equations can be cast as minimization: a system  
+```
+f_1(x)=0, …, f_m(x)=0
+```  
+can be reformulated by minimizing  
+```
+p(x)=f_1(x)^2 + … + f_m(x)^2 = ||f(x)||^2.
+```  
+The minimum value `p(x*)=0` is attained exactly when `x*` solves all equations. Thus, minimization provides a unifying framework for finding optimal or approximate solutions.
+
+### Quadratic Minimization (Single-Variable & Multi-Variable)
+
+**Single-Variable Case:**  
+A quadratic function in one variable is  
+```
+p(x) = a x^2 + 2b x + c.
+```  
+- If `a>0`, the parabola opens upward and has a unique minimum at  
+  ```
+  x* = -b/a
+  ```  
+  with minimum value  
+  ```
+  p(x*) = c - b^2/a.
+  ```  
+- If `a<0`, it opens downward and is unbounded below (no finite minimum).  
+- If `a=0`, the function is linear (no bounded minimum unless constant).
+
+**Multi-Variable Case:**  
+A quadratic function in R^n can be written
 
 ```
-f_1(x) = 0, …, f_m(x) = 0
+p(x) = x^T K x - 2 x^T f + c,
 ```
 
-can be reformulated by minimizing:  
+where `K` is an n×n symmetric matrix, `f` is a constant vector, and `c` is a constant scalar.  
+To minimize, set the gradient to zero:
 
 ```
-p(x) = f_1(x)^2 + … + f_m(x)^2 = ||f(x)||^2.
+∇p(x) = 2Kx - 2f = 0 ⇒ Kx = f.
 ```
 
-The minimum value `p(x*) = 0` is attained exactly when `x*` solves all equations. Thus, minimization provides a unifying framework for finding optimal or approximate solutions.
+If `K` is invertible (positive definite), the unique minimizer is
+
+```
+x* = K^{-1} f,
+```
+
+and the minimum value is
+
+```
+p(x*) = c - f^T K^{-1} f.
+```
+
+### Least Squares Minimization and Geometric Interpretation  
+Given an (often overdetermined) linear system `Ax = b` where `A` is m×n, we define the residual `r = b - Ax` and minimize the squared error
+
+```
+p(x) = ||Ax - b||^2.
+```
+
+The vector `x*` minimizing this is called the **least squares solution**. Geometrically, the set `{Ax : x in R^n}` is a subspace of R^m. Finding `x*` projects `b` orthogonally onto that subspace. The residual `b - Ax*` is orthogonal to every column of `A`.
+
+### Positive Definite vs. Semi-Definite Matrices (Uniqueness of Minima)  
+- **Positive Definite (PD):** If `K` is PD (`x^T K x > 0` for all nonzero `x`), then `p(x)` is strictly convex and has a unique global minimizer `x* = K^{-1} f`.  
+- **Positive Semi-Definite (PSD):** If `K` is PSD (`x^T K x ≥ 0`), minima exist but may not be unique. Any component in the nullspace of `K` can be added to a minimizer without changing the value.  
+- **Indefinite:** If `K` has negative eigenvalues, `p(x)` is unbounded below and has no global minimum.
+
+For least squares, `K = A^T A` is always PSD. If `A` has full column rank, `A^T A` is PD and the least squares solution is unique. If `A` is rank-deficient, infinitely many minimizers exist (all yielding the same minimal error).
+
+### Normal Equations and Conditions for Solvability  
+Setting the gradient of `||Ax - b||^2` to zero yields the **normal equations**:
+
+```
+A^T A x = A^T b.
+```
+
+- If `A^T A` is invertible (full column rank), the unique solution is
+
+  ```
+  x* = (A^T A)^{-1} A^T b.
+  ```
+
+- If `A^T A` is singular, there are infinitely many solutions minimizing the error. One often selects the minimum-norm solution via the pseudoinverse.
+
+**Weighted Least Squares:** Introduce a positive-definite weight matrix `C`. Minimize `||C^{1/2}(Ax - b)||^2`, leading to
+
+```
+A^T C A x = A^T C b,
+x* = (A^T C A)^{-1} A^T C b.
+```
+
+Weights adjust for varying reliability or importance of different equations or data points.
 
 ---
 
-### ✅ Quadratic Minimization (Single-Variable & Multi-Variable)
+## Problem-Solving Strategies
 
-#### 🔹 Single-Variable Case
-A quadratic function in one variable is defined as:  
+1. **Solve Least Squares via Normal Equations**  
+   - Form `A^T A` and `A^T b`.  
+   - Solve `A^T A x = A^T b`.  
+   - If `A^T A` is invertible, compute `x* = (A^T A)^{-1} A^T b`.
 
-```
-p(x) = a x^2 + 2b x + c
-```
+2. **Quadratic Forms (Matrix Method)**  
+   - Write `p(x) = x^T K x - 2 x^T f + c`.  
+   - Identify `K` (symmetric), `f`, and `c`.  
+   - Solve `Kx = f`.  
+   - If `K` is PD, this yields the unique minimizer `x*`.
 
-- If `a > 0`, the parabola opens upward with a unique minimum at:
+3. **Closest Point Problems via Gram Matrix**  
+   - Given basis `{w_i}` for subspace `W`, form Gram matrix `K_{ij} = <w_i, w_j>`.  
+   - Compute `f_i = <w_i, b>`.  
+   - Solve `Kx = f` to get coefficients `x`.  
+   - Reconstruct projection `w* = sum_i x_i w_i`.
 
-```
-x* = -b / a
-```
-
-with minimum value:  
-
-```
-p(x*) = c - b^2 / a
-```
-
-- If `a < 0`, the parabola opens downward (no finite minimum).  
-- If `a = 0`, the function is linear (no bounded minimum unless constant).
-
-#### 🔹 Multi-Variable Case
-A quadratic function in `R^n` can be expressed as:  
-
-```
-p(x) = x^T K x - 2 x^T f + c
-```
-
-where `K` is an `n x n` symmetric matrix, `f` is a constant vector, and `c` is a constant scalar. To minimize, set the gradient to zero:  
-
-```
-∇p(x) = 2Kx - 2f = 0  ⇒  Kx = f
-```
-
-If `K` is invertible (positive definite), the unique minimizer is:  
-
-```
-x* = K^{-1} f
-```
-
-with the minimum value:  
-
-```
-p(x*) = c - f^T K^{-1} f
-```
+4. **Gradient Descent vs. Analytical Minimization**  
+   - Analytical methods (normal equations, direct inversion) give closed‑form solutions for linear quadratics.  
+   - Gradient descent iteratively updates `x_{t+1} = x_t - α ∇p(x_t)` and is used when analytical solutions are infeasible (e.g., complex/non-quadratic loss, large-scale).
 
 ---
 
-### ✅ Least Squares Minimization & Geometric Interpretation
+## Worked Examples
 
-Given an overdetermined linear system `Ax = b`, the residual is defined as:
-
+### Example 1: Quadratic Function Minimization  
+**Problem:** Minimize  
 ```
-r = b - Ax
-```
-
-We minimize the squared error:
-
-```
-p(x) = ||Ax - b||^2
-```
-
-The vector `x*` minimizing this is the **least squares solution**. Geometrically, it projects `b` orthogonally onto the column space of `A`.
+p(x_1,x_2) = 4x_1^2 - 2x_1x_2 + 3x_2^2 + 3x_1 - 2x_2 + 1.
+```  
+**Solution:**  
+1. Identify `K = [[4, -1], [-1, 3]]`, `f = [-3/2, 1]^T`, `c=1`.  
+2. Solve `Kx=f` to get `x* = [-7/22, 5/22]^T`.  
+3. Since `K` is PD, this is unique. Minimum `p(x*) = 13/44`.
 
 ---
 
-### ✅ Positive Definite vs. Semi-Definite Matrices
-
-- **Positive Definite (PD):** Unique global minimizer `x* = K^{-1} f`.  
-- **Positive Semi-Definite (PSD):** Multiple minimizers; any nullspace component can be added to a minimizer without changing the minimum value.  
-- **Indefinite:** Unbounded below, no global minimum.
-
-For least squares, `K = A^T A` is always PSD. If `A` has full column rank, `A^T A` is PD and the least squares solution is unique.
+### Example 2: Least Squares for Overdetermined System  
+**Problem:**  
+```
+A = [[1,2],[3,-1],[-1,2],[1,-1],[2,1]], b = [1,0,-1,2,2]^T.
+```  
+**Solution:**  
+1. Compute `A^T A = [[16,-2],[-2,11]]`.  
+2. Compute `A^T b = [8,0]^T`.  
+3. Solve `(A^T A)x = A^T b`: `x* ≈ [0.5116, 0.0930]^T`.  
+4. Min squared error `||Ax*-b||^2 ≈ 4.369`.
 
 ---
 
-### ✅ Normal Equations & Weighted Least Squares
-
-Setting the gradient of `||Ax - b||^2` to zero yields:
-
+### Example 3: Closest Point in a Plane  
+**Problem:**  
 ```
-A^T A x = A^T b
-```
-
-- If `A^T A` is invertible:
-
-```
-x* = (A^T A)^{-1} A^T b
-```
-
-**Weighted Least Squares:**
-
-```
-A^T C A x = A^T C b
-```
-
-where `C` is a positive-definite weight matrix.
+w1 = [1,2,-1]^T, w2 = [2,-3,-1]^T, b = [1,0,0]^T.
+```  
+**Solution:**  
+1. Gram `K = [[6,-3],[-3,14]]`.  
+2. `f = [1,2]^T`.  
+3. Solve `Kx=f`: `x* = [4/15,1/5]`.  
+4. Projection `w* ≈ [0.667,-0.067,-0.467]^T`.  
+5. Distance `||b-w*|| ≈ 0.5774`.
 
 ---
 
-## 🛠️ Problem-Solving Strategies
+## Applications of Minimization
 
-1. **Least Squares via Normal Equations:**
-   - Form `A^T A` and `A^T b`.
-   - Solve `A^T A x = A^T b`.
-   - If `A^T A` is invertible, `x* = (A^T A)^{-1} A^T b`.
-
-2. **Quadratic Forms (Matrix Method):**
-   - Identify `K`, `f`, `c` and solve `Kx = f`.
-
-3. **Closest Point via Gram Matrix:**
-   - Construct Gram matrix `K_{ij} = <w_i, w_j>`.
-   - Solve `Kx = f` to obtain coefficients.
-
-4. **Gradient Descent:**
-   - Iteratively update `x_{t+1} = x_t - α ∇p(x_t)`.
+- **Regression & Data Fitting**: Least squares determines best-fit parameters for models.  
+- **Classification**: k-NN, SVM involve distance or quadratic minimization.  
+- **Control & Robotics**: Kalman filters, path planning minimize cost/estimation error.  
+- **Physics & Engineering**: Finite element methods minimize energy functionals.  
+- **Machine Learning**: Training models minimize loss functions analytically or by gradient descent.
 
 ---
 
-## ✅ Worked Examples
+## Summary Tables
 
-**Example 1: Quadratic Function Minimization**
-
-```
-p(x1, x2) = 4x1^2 - 2x1x2 + 3x2^2 + 3x1 - 2x2 + 1
-```
-
-- Identify `K = [[4, -1], [-1, 3]]`, `f = [-3/2, 1]^T`, `c = 1`
-- Solve `Kx = f` to obtain `x* = [-7/22, 5/22]^T`
-- Since `K` is PD, this is unique. Minimum `p(x*) = 13/44`.
-
-**Example 2: Least Squares for Overdetermined System**
-
-```
-A = [[1, 2], [3, -1], [-1, 2], [1, -1], [2, 1]], b = [1, 0, -1, 2, 2]^T
-```
-
-- Compute `A^T A` and `A^T b`
-- Solve `(A^T A)x = A^T b` to obtain `x* ≈ [0.5116, 0.0930]^T`
-- Minimum squared error `||Ax* - b||^2 ≈ 4.369`
-
----
-
-## ✅ Applications of Minimization
-
-- **Regression:** Least squares for data fitting.  
-- **Classification:** Distance-based methods like SVM.  
-- **Control Systems:** Kalman filters minimize estimation error.  
-- **Physics & Engineering:** Minimizing energy functionals.  
-- **Machine Learning:** Gradient descent to minimize loss.
-
----
-
-## ✅ Summary Table
-
+**Key Formulas**  
 | Type                 | Equation                | Solution                       |
 | -------------------- | ----------------------- | ------------------------------ |
-| Single-var quadratic | `p'(x) = 0`             | `x* = -b / a`                  |
-| Multi-var quadratic  | `Kx = f`                | `x* = K^{-1} f`                |
-| Least squares        | `A^T A x = A^T b`       | `x* = (A^T A)^{-1} A^T b`      |
-| Weighted LS          | `A^T C A x = A^T C b`   | `x* = (A^T C A)^{-1} A^T C b`  |
+| Single-var quadratic | `p'(x)=0`               | `x*=-b/a`, `p(x*)=c-b^2/a`     |
+| Multi-var quadratic  | `Kx=f`                  | `x*=K^{-1}f`; min `c-f^T K^{-1}f` |
+| Least squares        | `A^T A x = A^T b`       | `x*=(A^T A)^{-1}A^T b`         |
+| Weighted LS          | `A^T C A x = A^T C b`   | `x*=(A^T C A)^{-1}A^T C b`     |
+| Orthonormal proj.    | `w* = sum <b,u_i> u_i`  | Direct inner products         |
 
-**Conditions:** Unique if matrix is PD; Multiple if PSD; None if indefinite.
+**Conditions**  
+- Unique if matrix PD.  
+- Multiple if PSD but singular.  
+- None if indefinite.
